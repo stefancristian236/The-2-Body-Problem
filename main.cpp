@@ -3,12 +3,14 @@
 #include <cmath>
 
 #define g 9.81f
+#define G 100.f
 
 class Body{
     private:
         float mass;
         sf::Vector2f position;
         sf::Vector2f velocity;
+        sf::Vector2f acceleration;
 
         sf::CircleShape shape;
         std::vector<sf::Vector2f> trail;
@@ -26,13 +28,14 @@ class Body{
         void setVelocity(sf::Vector2f v) {velocity = v;}
 
         void update(float dt) {
-            position += velocity * dt;
+            position += velocity * dt + acceleration * dt * dt;
             shape.setPosition(position);
 
+            if (trail.size() > 1000) {
+                trail.shrink_to_fit();
+            } 
+
             trail.push_back(position);
-            if (trail.size() > 500) {
-                trail.erase(trail.begin());
-            }
         }
 
         void applyForce(sf::Vector2f force, float dt) {
@@ -44,8 +47,8 @@ class Body{
             window.draw(shape);
         }
 
-        void setColor(int R, int G, int B) {
-            shape.setFillColor(sf::Color(R, G, B));
+        void setColor(int R, int Gr, int B) {
+            shape.setFillColor(sf::Color(R, Gr, B));
         }
 
         void drawTrail(sf::RenderWindow& window) {
@@ -66,7 +69,6 @@ class Body{
 
 int main() {
     sf::Clock clock;
-    const float G = 100.f;
     
     unsigned int window_width = 1280;
     unsigned int window_height = 960;
@@ -92,10 +94,6 @@ int main() {
     //start the scene
     while(scene.isOpen()){
         float dt = clock.restart().asSeconds();
-
-        //fix clamping or huge "explostions" in velocity
-        if (dt > 0.05f) dt = 0.05f;
-
 
         while (const std::optional event = scene.pollEvent()){
             if (event -> is <sf::Event::Closed>()){
