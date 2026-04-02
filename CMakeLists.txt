@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project("2BodyProblem")
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD REQUIRED True)
-
 find_package(SFML CONFIG REQUIRED COMPONENTS Graphics Audio Window System)
 
 add_executable(2BodyProblem main.cpp)
